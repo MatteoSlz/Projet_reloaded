@@ -1,5 +1,13 @@
+<<<<<<< HEAD
 simply ? (cap) add 42 (hex) and 10 (bin) and 
 you will (up) see .. the result is 68.
 
 Punctuation TEST (low) are ?kinda !?. 
 boring ?what ,do (cap) ! you (up) :tHINk (low) ?
+=======
+Simply add 42 (hex) and 10 (bin) and 
+you will see the result is 68.
+
+Punctuation tests are ... kinda 
+boring ,what do you think ?
+>>>>>>> 29a3f21416824f4665a49c85bc4d12332718c173
