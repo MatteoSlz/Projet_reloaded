@@ -12,9 +12,6 @@ func Converthex(nbr string) string {
 	hex := "0123456789ABCDEF"
 	resultat := 0
 	for _, valeur := range nbr {
-		if valeur >= 'a' && valeur <= 'f' {
-			valeur -= 32
-		}
 		for i, valeurHex := range hex {
 			if valeur == valeurHex {
 				resultat = resultat*16 + i
@@ -81,17 +78,18 @@ func main() {
 	count := ""
 	nouveau_contenu := []byte{}
 	texte := os.Args[1]
+	mot_apostrophe_debut := ""
+	mot_apostrophe_fin := ""
 
 	contenu_byte, err := os.ReadFile(texte)
 	if err != nil {
 		fmt.Println("Erreur lors de la lecture du fichier :", err)
 		return
 	}
-
+	
 	contenu_string := string(contenu_byte)
 	var tableau []string
 	mot := ""
-
 	for _, s := range contenu_string {
 		if s != ' ' && s != '\n' && s != '\t' {
 			mot = mot + string(s)
@@ -106,130 +104,149 @@ func main() {
 		tableau = append(tableau, mot)
 	}
 
-	for i := 1; i < len(tableau); i++ {
+	for i := 0; i < len(tableau); i++ {
+		if tableau[i] == "" {
+			continue
+		}
+
 		action_effectuer = false
-		if len(tableau[i]) > 0 && tableau[i][0] == ',' {
-			tableau[i-1] = tableau[i-1] + ","
-			count = ""
-			for k := 1; k < len(tableau[i]); k++ {
-				count = count + string(tableau[i][k])
+		
+		if (tableau[i] == "'") && (apostrophe_debut == false) {
+			if i+1 < len(tableau) {
+				tableau[i+1] = "'" + tableau[i+1]
+				tableau[i] = ""
+				apostrophe_debut = true
 			}
-			tableau[i] = count
-			action_effectuer = true
-
-		}
-		if len(tableau[i]) > 0 && tableau[i][0] == ';' {
-			tableau[i-1] = tableau[i-1] + ";"
-			count = ""
-			for k := 1; k < len(tableau[i]); k++ {
-				count = count + string(tableau[i][k])
+		} 
+		if (tableau[i] == "'") && (apostrophe_debut == true) { 
+			j := i - 1
+			for j >= 0 && tableau[j] == "" {
+				j--
 			}
-			tableau[i] = count
-			action_effectuer = true
-		}
-		if len(tableau[i]) > 0 && tableau[i][0] == '.' {
-			tableau[i-1] = tableau[i-1] + "."
-			count = ""
-			for k := 1; k < len(tableau[i]); k++ {
-				count = count + string(tableau[i][k])
+			if j >= 0 {
+				tableau[j] = tableau[j] + "'"
+				tableau[i] = ""
+				apostrophe_debut = false
 			}
-			tableau[i] = count
-			action_effectuer = true
 		}
-		if len(tableau[i]) > 0 && tableau[i][0] == ':' {
-			tableau[i-1] = tableau[i-1] + ":"
-			count = ""
-			for k := 1; k < len(tableau[i]); k++ {
-				count = count + string(tableau[i][k])
+		if i > 0 && len(tableau[i-1]) > 0 {
+			if (string(tableau[i-1][len(tableau[i-1])-1]) == "'") && (apostrophe_debut == false) {
+				for k := 0 ; k<(len(tableau[i-1])-1);k++{
+					mot_apostrophe_debut = mot_apostrophe_debut + string(tableau[i-1][k])
+				}
+				tableau[i-1] = mot_apostrophe_debut
+				apostrophe_debut = true 
+				tableau[i] = "'" + tableau[i]
+				mot_apostrophe_debut = ""
 			}
-			tableau[i] = count
-			action_effectuer = true
 		}
-		if len(tableau[i]) > 0 && tableau[i][0] == '!' {
-			tableau[i-1] = tableau[i-1] + "!"
-			count = ""
-			for k := 1; k < len(tableau[i]); k++ {
-				count = count + string(tableau[i][k])
+		if i < len(tableau)-1 && len(tableau[i+1]) > 0 { 		
+			if (string(tableau[i+1][len(tableau[i+1])-1]) == "'") && (apostrophe_debut == true) {
+				for k := 0 ; k<(len(tableau[i+1])-1);k++{
+					mot_apostrophe_fin = mot_apostrophe_fin + string(tableau[i+1][k])
+				}
+				tableau[i+1] = mot_apostrophe_fin
+				apostrophe_debut = false
+				tableau[i] = tableau[i] + "'" 
+				mot_apostrophe_fin = ""
 			}
-			tableau[i] = count
-			action_effectuer = true
 		}
-		if len(tableau[i]) > 0 && tableau[i][0] == '?' {
-			tableau[i-1] = tableau[i-1] + "?"
-			count = ""
-			for k := 1; k < len(tableau[i]); k++ {
-				count = count + string(tableau[i][k])
-			}
-			tableau[i] = count
-			action_effectuer = true
-		}
-		if tableau[i] == "," {
-			tableau[i-1] = tableau[i-1] + ","
-			tableau[i] = ""
-			action_effectuer = true
-		}
-		if tableau[i] == "?" {
-			tableau[i-1] = tableau[i-1] + "?"
-			tableau[i] = ""
-			action_effectuer = true
-		}
-		if tableau[i] == "!" {
-			tableau[i-1] = tableau[i-1] + "!"
-			tableau[i] = ""
-			action_effectuer = true
-		}
-		if tableau[i] == ";" {
-			tableau[i-1] = tableau[i-1] + ";"
-			tableau[i] = ""
-			action_effectuer = true
-		}
-		if tableau[i] == "." {
-			tableau[i-1] = tableau[i-1] + "."
-			tableau[i] = ""
-			action_effectuer = true
-		}
-		if tableau[i] == ":" {
-			tableau[i-1] = tableau[i-1] + ":"
-			tableau[i] = ""
-			action_effectuer = true
-		}
-
 		j := i - 1
-		if j >= 0 && tableau[j] == "" {
+		for j >= 0 && tableau[j] == "" {
 			j--
 		}
-
 		mot_precedent := j
-
-		if tableau[i] == "(hex)" {
-			tableau[mot_precedent] = Converthex(tableau[mot_precedent])
-			tableau[i] = ""
-			action_effectuer = true
-		}
-		if tableau[i] == "(bin)" {
-			tableau[mot_precedent] = Convertbin(tableau[mot_precedent])
-			tableau[i] = ""
-			action_effectuer = true
-		}
-		if tableau[i] == "(up)" {
-			tableau[mot_precedent] = ToUpper(tableau[mot_precedent])
-			tableau[i] = ""
-			action_effectuer = true
-		}
-		if tableau[i] == "(low)" {
-			tableau[mot_precedent] = ToLower(tableau[mot_precedent])
-			tableau[i] = ""
-			action_effectuer = true
-		}
-		if tableau[i] == "(cap)" {
-			tableau[mot_precedent] = ToCap(tableau[mot_precedent])
-			tableau[i] = ""
-			action_effectuer = true
+		if mot_precedent >= 0 {
+			if len(tableau[i]) > 0 && tableau[i][0] == ',' {
+				tableau[mot_precedent] = tableau[mot_precedent] + ","
+				count = ""
+				for k := 1; k < len(tableau[i]); k++ {
+					count = count + string(tableau[i][k])
+				}
+				tableau[i] = count
+				action_effectuer = true
+			}
+			if len(tableau[i]) > 0 && tableau[i][0] == ';' {
+				tableau[mot_precedent] = tableau[mot_precedent] + ";"
+				count = ""
+				for k := 1; k < len(tableau[i]); k++ {
+					count = count + string(tableau[i][k])
+				}
+				tableau[i] = count
+				action_effectuer = true
+			}
+			if len(tableau[i]) > 0 && tableau[i][0] == '.' {
+				tableau[mot_precedent] = tableau[mot_precedent] + "."
+				count = ""
+				for k := 1; k < len(tableau[i]); k++ {
+					count = count + string(tableau[i][k])
+				}
+				tableau[i] = count
+				action_effectuer = true
+			}
+			if len(tableau[i]) > 0 && tableau[i][0] == ':' {
+				tableau[mot_precedent] = tableau[mot_precedent] + ":"
+				count = ""
+				for k := 1; k < len(tableau[i]); k++ {
+					count = count + string(tableau[i][k])
+				}
+				tableau[i] = count
+				action_effectuer = true
+			}
+			if len(tableau[i]) > 0 && tableau[i][0] == '!' {
+				tableau[mot_precedent] = tableau[mot_precedent] + "!"
+				count = ""
+				for k := 1; k < len(tableau[i]); k++ {
+					count = count + string(tableau[i][k])
+				}
+				tableau[i] = count
+				action_effectuer = true
+			}
+			if len(tableau[i]) > 0 && tableau[i][0] == '?' {
+				tableau[mot_precedent] = tableau[mot_precedent] + "?"
+				count = ""
+				for k := 1; k < len(tableau[i]); k++ {
+					count = count + string(tableau[i][k])
+				}
+				tableau[i] = count
+				action_effectuer = true
+			}
+			if tableau[i] == "," || tableau[i] == "?" || tableau[i] == "!" ||
+				tableau[i] == ";" || tableau[i] == "." || tableau[i] == ":" {
+				tableau[mot_precedent] = tableau[mot_precedent] + tableau[i]
+				tableau[i] = ""
+				action_effectuer = true
+			}
+			if tableau[i] == "(hex)" {
+				tableau[mot_precedent] = Converthex(tableau[mot_precedent])
+				tableau[i] = ""
+				action_effectuer = true
+			}
+			if tableau[i] == "(bin)" {
+				tableau[mot_precedent] = Convertbin(tableau[mot_precedent])
+				tableau[i] = ""
+				action_effectuer = true
+			}
+			if tableau[i] == "(up)" {
+				tableau[mot_precedent] = ToUpper(tableau[mot_precedent])
+				tableau[i] = ""
+				action_effectuer = true
+			}
+			if tableau[i] == "(low)" {
+				tableau[mot_precedent] = ToLower(tableau[mot_precedent])
+				tableau[i] = ""
+				action_effectuer = true
+			}
+			if tableau[i] == "(cap)" {
+				tableau[mot_precedent] = ToCap(tableau[mot_precedent])
+				tableau[i] = ""
+				action_effectuer = true
+			}
 		}
 		if action_effectuer {
 			i = i - 2
-			if i < 0 {
-				i = 0
+			if i < -1 {
+				i = -1
 			}
 		}
 	}
