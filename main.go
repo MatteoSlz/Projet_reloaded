@@ -1,4 +1,3 @@
-
 package main
 
 import (
@@ -8,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 )
+
+var position_apostrophe = 0
 
 func Converthex(nbr string) string {
 	hex := "0123456789ABCDEF"
@@ -73,13 +74,17 @@ func ToCap(s string) string {
 	return char
 }
 
+func apostrophe(mots []string) []string {
+	resultat := mots
+	return resultat
+}
+
 func main() {
-	apostrophe_debut := false
+	hors_apostrophe := true
 	action_effectuer := false
 	count := ""
 	nouveau_contenu := []byte{}
 	texte := os.Args[1]
-	mot_apostrophe_fin := ""
 
 	contenu_byte, err := os.ReadFile(texte)
 	if err != nil {
@@ -91,16 +96,31 @@ func main() {
 	var tableau []string
 	mot := ""
 
-	for _, s := range contenu_string {
-		if s != ' ' && s != '\n' && s != '\t' {
-			mot += string(s)
+		for _, s := range contenu_string {
+		if s != ' ' && s != '\n' && s != '\t' && s != '\r' {
+			if s == '\'' {
+				if mot != "" {
+					tableau = append(tableau, mot)
+					mot = ""
+				}
+				tableau = append(tableau, "'")
+			} else {
+				mot = mot + string(s)
+			}
 		} else {
 			if mot != "" {
 				tableau = append(tableau, mot)
 				mot = ""
 			}
+			if s == '\n' {
+				tableau = append(tableau, "\n")
+			}
 		}
 	}
+	if mot != "" {
+		tableau = append(tableau, mot)
+	}
+
 	if mot != "" {
 		tableau = append(tableau, mot)
 	}
@@ -109,30 +129,40 @@ func main() {
 		if tableau[i] == "" {
 			continue
 		}
+
 		action_effectuer = false
 
-		
-		if i > 0 && len(tableau[i-1]) > 0 {
-			if tableau[i-1][len(tableau[i-1])-1] == '\'' &&
-				apostrophe_debut == false {
-
-				tableau[i-1] = tableau[i-1][:len(tableau[i-1])-1]
-				apostrophe_debut = true
-				tableau[i] = "'" + tableau[i]
+		if (i > 0) && (i < len(tableau)) && (len(tableau[i]) >= 1) {
+		if tableau[i] == "'" {
+			if hors_apostrophe {
+				suivant := i + 1
+				for suivant < len(tableau) && tableau[suivant] == "" {
+					suivant++
+				}
+				if suivant < len(tableau) {
+					tableau[suivant] = "'" + tableau[suivant]
+					tableau[i] = ""
+					hors_apostrophe = false
+				}
+			} else {
+				precedent := i - 1
+				for precedent >= 0 && tableau[precedent] == "" {
+					precedent--
+				}
+				if precedent >= 0 {
+					tableau[precedent] = tableau[precedent] + "'"
+					tableau[i] = ""
+					hors_apostrophe = true
+				}
+			}
+		} else if len(tableau[i]) > 1 {
+			if tableau[i][0] == '\'' {
+				hors_apostrophe = false
+			} else if tableau[i][len(tableau[i])-1] == '\'' {
+				hors_apostrophe = true
 			}
 		}
-		if i < len(tableau)-1 && len(tableau[i+1]) > 0 {
-  		     if tableau[i+1][0] == '\'' {
-        for x := 1; x < len(tableau[i+1]); x++ {
-            mot_apostrophe_fin += string(tableau[i+1][x])
-        }
-        tableau[i+1] = mot_apostrophe_fin
-        tableau[i] += "'"
-        mot_apostrophe_fin = ""
-        apostrophe_debut = false
-    }
-}
-
+		}
 		j := i - 1
 		for j >= 0 && tableau[j] == "" {
 			j--
@@ -200,10 +230,7 @@ func main() {
 				action_effectuer = true
 			}
 
-			if tableau[i] == "," || tableau[i] == "?" ||
-				tableau[i] == "!" || tableau[i] == ";" ||
-				tableau[i] == "." || tableau[i] == ":" {
-
+			if tableau[i] == "," || tableau[i] == "?" || tableau[i] == "!" || tableau[i] == ";" || tableau[i] == "." || tableau[i] == ":" {
 				tableau[mot_precedent] += tableau[i]
 				tableau[i] = ""
 				action_effectuer = true
@@ -246,7 +273,7 @@ func main() {
 				i = -1
 			}
 		}
-	}
+	} 
 
 	resultat := ""
 	for _, mot := range tableau {
@@ -258,5 +285,9 @@ func main() {
 			nouveau_contenu = []byte(resultat)
 		}
 	}
+
 	err = os.WriteFile(os.Args[2], nouveau_contenu, 0644)
-}
+	if err != nil {
+		fmt.Println("Erreur ", err)
+	}
+} 

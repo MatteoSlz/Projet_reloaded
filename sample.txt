@@ -1,5 +1,5 @@
 Simply add 42 (hex)  and (up) 10 (bin) and
-you ' will see the ' result is 68.
+you' will see the ' result ,is 68.
 
-PunCTUATION (low) (cap) tests are ... kinda 
-boring ,what do you think ?
+punCTUATION (low) (cap) tests ,are ... kinda 
+boring : whatif do youyou think ?
