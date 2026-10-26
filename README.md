@@ -1,5 +1,7 @@
 # Projet_reloaded
 
+Initialisation : 
+
 Pour commencer il vous faut un logiciel de code, de preference vscode. une fois sur vs code il faut installé le langage golang et l'outil git. Ensuite faire git clone https://github.com/MatteoSlz/Projet_reloaded
 
 Lancement du programme :
@@ -8,7 +10,7 @@ Pour lancer le programme, il faut faire go run main.go "dossier de départ en .t
 
 Explication du programme :
 
-Le programme va prendre en entrée un texte et il va y appliquer plusieurs actions en fonction de ce même texte.
+Le programme va prendre en entrée un texte et il va y appliquer plusieurs actions en fonction de ce même texte comme mettre en majuscules, effectuer des calcules, faire les bonnes indentations.
 
 Tout d'abord, le programme va lire le fichier d'entrée en .txt et créer un tableau où il va ranger tous les mots séparés par un espace. Par exemple "bonjour (cap) je suis étudiant" va créer un tableau de string qui va contenir {"bonjour" , "(cap)", "je", "suis", "étudiant"}.
 
