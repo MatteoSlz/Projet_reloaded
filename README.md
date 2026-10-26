@@ -1,5 +1,7 @@
 # Projet_reloaded
 
+Pour commencer il vous faut un logiciel de code, de preference vscode. une fois sur vs code il faut installé le langage golang et l'outil git. Ensuite faire git clone https://github.com/MatteoSlz/Projet_reloaded
+
 Lancement du programme :
 
 Pour lancer le programme, il faut faire go run main.go "dossier de départ en .txt" "dossier qui va recevoir le nouveau texte.txt"
