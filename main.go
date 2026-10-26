@@ -265,6 +265,15 @@ func main() {
 				tableau[i] = ""
 				action_effectuer = true
 			}
+
+			if tableau[i] == "a"  && (i+1) < len(tableau){
+				switch string(tableau[i+1][0]){
+				case "a","e","i","o","u","y" : 
+				tableau[i] = "an"
+				action_effectuer = true  
+				}
+
+			}
 		}
 
 		if action_effectuer {
